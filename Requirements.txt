@@ -1,0 +1,30 @@
+api
+
+1.Batch Api
+--Batch Name,Courseid ,status
+
+2.Category
+--Category Name,Status
+
+3.Sub Category
+--Category id , SubCategory Name,status
+
+4.Course
+--Course Name,category,subcategory,status
+
+5.Student
+--name,email,pwd,pnumber,profile, batch_id ,isAdmin,dateofjoining
+
+6.My Class
+--topic name,desc,shor desc,date,startitme,endtime,instructor_id,materialslinks(json),zoomlink,recordingurl,classtype(1-indiv,2-batch),batch_orstudent_id,
+
+7.instructor
+--name,profile,role,ratings
+
+8.login api
+
+9.Assesment,
+ --classid,classtype(1-indiv,2-batch),start date,end date,start time,end time,
+
+10.Task Submission
+--stuid,assid,status(1-completed,2-incomp)
