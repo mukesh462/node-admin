@@ -58,14 +58,25 @@ exports.getInstructorById = async (req, res) => {
 
 // Update an instructor by ID
 exports.updateInstructor = async (req, res) => {
-    try {
-      const instructor = await Instructor.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-      if (!instructor) return res.status(404).json({ error: 'instructor not found' });
-      res.status(200).json({ status : true, message: "instructor Updated Successfully", data: instructor });
-    } catch (error) {
-      res.status(500).json({ status : false, error: error.message });
+  try {
+    let updatedData = { ...req.body };
+    if (req.file) {
+      updatedData.profile = `uploads/${req.file.filename}`;
     }
-  };
+    const instructor = await Instructor.findByIdAndUpdate(req.params.id,updatedData,{ new: true, runValidators: true });
+    if (!instructor) {
+      return res.status(404).json({ status: false, error: 'Instructor not found' });
+    }
+    res.status(200).json({
+      status: true,
+      message: 'Instructor Updated Successfully',
+      data: instructor,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
+
 
 // Delete an instructor by ID
 exports.deleteInstructor = async (req, res) => {
