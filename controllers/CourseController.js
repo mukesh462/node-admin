@@ -19,14 +19,22 @@ exports.getAllCourse = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
-    const course = await Course.find().skip(startIndex).limit(limit);
+    const courses_lists = await Course.find().skip(startIndex).limit(limit).populate({path:'category_id',select:"category_name"}).populate({path:'subcategory_id',select:"subcategory_name"});
+    
+    const courselist= courses_lists.map(course => ({
+      _id: course._id,
+      course_name: course.course_name,
+      category_name: course.category_id.category_name,
+      subcategory_name: course.subcategory_id.subcategory_name,
+      status: course.status,
+    }));
     const totalCourse = await Course.countDocuments();
     const totalPages = Math.ceil(totalCourse / limit);
     const nextPage = page < totalPages ? page + 1 : null;
     res.status(200).json({
       status: true,
       message: "Course Listed Successfully",
-      data: course,
+      data: courselist,
       paginate: {
         total_count: totalCourse,
         current_page: page,

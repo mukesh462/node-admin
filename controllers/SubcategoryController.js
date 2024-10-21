@@ -21,7 +21,15 @@ exports.getAllSubcategory = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
-    const subcategory = await Subcategory.find().skip(startIndex).limit(limit);
+    const subcategories = await Subcategory.find().skip(startIndex).limit(limit).populate({path:'category_id',select:"category_name"});
+
+    const subcategory= subcategories.map(subcategory => ({
+        _id: subcategory._id,
+        category_name: subcategory.category_id.category_name,
+        subcategory_name: subcategory.subcategory_name,
+        status: subcategory.status,
+      }));
+
     const totalSubcategory = await Subcategory.countDocuments();
     const totalPages = Math.ceil(totalSubcategory / limit);
     const nextPage = page < totalPages ? page + 1 : null;

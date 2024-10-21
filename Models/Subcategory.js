@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const SubcategorySchema = new mongoose.Schema({
-  category_id: { type: Number, required: true },
+  category_id: { type: String, required: true,ref:'Category'},
   subcategory_name: { type: String, required: true },
   status: { type: String, required: true },
 });
