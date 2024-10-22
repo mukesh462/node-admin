@@ -77,3 +77,21 @@ exports.deleteCategory = async (req, res) => {
     res.status(500).json({  status: false,error: error.message });
   }
 };
+
+//get all category without pagination
+exports.getCategories = async (req, res) => {
+  try {
+  
+    const categories = await Category.find({ status: 'active' });
+    if (categories.length === 0) {
+      return res.status(404).json({ message: 'No categories found' });
+    }
+    res.status(200).json({
+      status: true,
+      message: "Category Listed Successfully",
+      data: categories,
+    });
+  } catch (error) {
+    res.status(500).json({  status: false,error: error.message });
+  }
+};

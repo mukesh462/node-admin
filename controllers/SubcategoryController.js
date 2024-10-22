@@ -99,3 +99,20 @@ exports.deleteSubcategory = async (req, res) => {
     res.status(500).json({ status: false, error: error.message });
   }
 };
+
+exports.getallsubcategory_by_id = async(req,res)=>{
+
+  try{
+    const subCategories = await Subcategory.find({ "category_id": req.body.category_id });
+
+    if (subCategories.length === 0) {
+      return res.status(404).json({ message: 'No subcategories found for this category' });
+    }
+    res.json({ status: true, data: subCategories });
+
+  }
+  catch(error){
+    res.status(500).json({ status: false, error: error.message });
+
+  }
+}
