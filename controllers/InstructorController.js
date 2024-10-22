@@ -1,4 +1,6 @@
 const Instructor = require("../Models/Instructor");
+const { upload } = require('../common/common');
+
 
 // Create a new instructor
 exports.createInstructor = async (req, res) => {
@@ -59,7 +61,9 @@ exports.getInstructorById = async (req, res) => {
 // Update an instructor by ID
 exports.updateInstructor = async (req, res) => {
   try {
+    
     let updatedData = { ...req.body };
+    
     if (req.file) {
       updatedData.profile = `uploads/${req.file.filename}`;
     }

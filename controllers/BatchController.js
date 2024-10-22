@@ -42,7 +42,7 @@ exports.getAllBatch = async (req, res) => {
 exports.getBatchById = async (req, res) => {
   try {
     const batch = await Batch.findById(req.params.id);
-    if (!batch) return res.status(404).json({ error: "Batch not found" });
+    if (!batch) return res.status(404).json({ status:false,error: "Batch not found" });
     res
       .status(200)
       .json({ status:true, message: "Single Batch Listed Successfully", data: batch });
@@ -58,7 +58,7 @@ exports.updateBatch = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    if (!batch) return res.status(404).json({ error: "Batch not found" });
+    if (!batch) return res.status(404).json({status:false, error: "Batch not found" });
     res
       .status(200)
       .json({status:true, message: "Batch Updated Successfully", data: batch });
