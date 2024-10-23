@@ -50,7 +50,7 @@ exports.getAllCourse = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).json({status:false, error: "Course not found" });
+    if (!course) return res.status(200).json({status:false, error: "Course not found" });
     res
       .status(200)
       .json({status:true, message: "Single Course Listed Successfully", data: course });
@@ -85,3 +85,13 @@ exports.deleteCourse = async (req, res) => {
     res.status(500).json({status:false, error: error.message });
   }
 };
+
+exports.getCourseAll= async(req,res)=>{
+  try {
+    const course = await Course.find();
+    if (!course) return res.status(200).json({status:false, message: "Course not found",data:[] });
+    res.json({status:true, message: "Course listed successfully" ,data:course});
+  } catch (error) {
+    res.status(500).json({status:false, error: error.message });
+  }
+}

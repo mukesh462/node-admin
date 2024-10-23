@@ -19,7 +19,9 @@ exports.getAllBatch = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
-    const batch = await Batch.find().skip(startIndex).limit(limit);
+    const batch = await Batch.find().populate('course_id').skip(startIndex).limit(limit);
+    console.log('Batches:', batch);
+
     const totalBatch = await Batch.countDocuments();
     const totalPages = Math.ceil(totalBatch / limit);
     const nextPage = page < totalPages ? page + 1 : null;

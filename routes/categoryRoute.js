@@ -7,6 +7,6 @@ router.post('/list', categoryController.getAllCategory);
 router.get('/:id', categoryController.getCategoryById);
 router.post('/update/:id', categoryController.updateCategory);
 router.delete('/:id', categoryController.deleteCategory);
-router.post('/getlists', categoryController.getCategories);
+router.post('/getlist', categoryController.getCategories);
 
 module.exports = router;

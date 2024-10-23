@@ -82,7 +82,7 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategories = async (req, res) => {
   try {
   
-    const categories = await Category.find({ status: 'active' });
+    const categories = await Category.find({ status: '1' });
     if (categories.length === 0) {
       return res.status(404).json({ message: 'No categories found' });
     }

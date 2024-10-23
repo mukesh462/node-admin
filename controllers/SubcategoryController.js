@@ -53,7 +53,7 @@ exports.getSubcategoryById = async (req, res) => {
   try {
     const SubCategory = await Subcategory.findById(req.params.id);
     if (!SubCategory)
-      return res.status(404).json({status: false, error: "Subcategory not found" });
+      return res.status(200).json({status: false, error: "Subcategory not found" });
     res.status(200).json({
       status: true,
       message: "Single Subcategory Listed Successfully",
@@ -106,7 +106,7 @@ exports.getallsubcategory_by_id = async(req,res)=>{
     const subCategories = await Subcategory.find({ "category_id": req.body.category_id });
 
     if (subCategories.length === 0) {
-      return res.status(404).json({ message: 'No subcategories found for this category' });
+      return res.status(200).json({ message: 'No subcategories found for this category',data:[],status:true });
     }
     res.json({ status: true, data: subCategories });
 
