@@ -9,7 +9,7 @@ exports.createCourse = async (req, res) => {
       .status(200)
       .json({ status:true,message: "Course Created Successfully", data: newCourse });
   } catch (error) {
-    res.status(400).json({ status:false,error: error.message });
+    res.status(500).json({ status:false,error: error.message });
   }
 };
 
@@ -50,7 +50,7 @@ exports.getAllCourse = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
-    if (!course) return res.status(200).json({status:false, error: "Course not found" });
+    if (!course) return res.status(200).json({status:false, error: "Course not found",data:[] });
     res
       .status(200)
       .json({status:true, message: "Single Course Listed Successfully", data: course });
@@ -66,7 +66,7 @@ exports.updateCourse = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    if (!course) return res.status(404).json({ status:false,error: "Course not found" });
+    if (!course) return res.status(200).json({ status:false,error: "Course not found",data:[] });
     res
       .status(200)
       .json({status:true, message: "Course Updated Successfully", data: course });
@@ -79,8 +79,8 @@ exports.updateCourse = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);
-    if (!course) return res.status(404).json({status:false, error: "Course not found" });
-    res.json({status:true, message: "Course deleted successfully" });
+    if (!course) return res.status(200).json({status:false, error: "Course not found" ,data:[]});
+    res.json({status:true, message: "Course deleted successfully" ,data:[]});
   } catch (error) {
     res.status(500).json({status:false, error: error.message });
   }

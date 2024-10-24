@@ -9,21 +9,19 @@ exports.loginStudent = async (req, res) => {
     // Find student by email
     const student = await Student.findOne({ email });
     if (!student) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(500).json({ message: "Invalid email" });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(pwd, student.pwd);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(500).json({ message: "Invalid password" });
     }
 
     console.log("JWT Secret:", process.env.JWT_SECRET);
 
     // Generate JWT token
-    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET);
 
     // Respond with token
     res.json({ token });

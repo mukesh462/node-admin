@@ -7,6 +7,6 @@ router.post('/create',upload.single('file'),instructorController.createInstructo
 router.post('/list', instructorController.getAllInstructor);
 router.get('/:id', instructorController.getInstructorById);
 router.post('/update/:id',upload.single('file'),instructorController.updateInstructor);
-router.delete('/:id', instructorController.deleteInstructor);
+router.delete('/delete/:id', instructorController.deleteInstructor);
 
 module.exports = router;

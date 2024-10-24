@@ -16,7 +16,7 @@ exports.createStudent = async (req, res) => {
         data: newStudent,
       });
   } catch (error) {
-    res.status(400).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, error: error.message });
   }
 };
 
@@ -49,7 +49,7 @@ exports.getAllStudent = async (req, res) => {
 exports.getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
-    if (!student) return res.status(404).json({ error: "student not found" });
+    if (!student) return res.status(200).json({ error: "student not found",data:[] });
     res
       .status(200)
       .json({
@@ -74,8 +74,8 @@ exports.updateStudent = async (req, res) => {
     });
     if (!student)
       return res
-        .status(404)
-        .json({ status: false, error: "student not found" });
+        .status(200)
+        .json({ status: false, error: "student not found",data:[] });
     res
       .status(200)
       .json({
@@ -94,9 +94,9 @@ exports.deleteStudent = async (req, res) => {
     const student = await Student.findByIdAndDelete(req.params.id);
     if (!student)
       return res
-        .status(404)
-        .json({ status: false, error: "student not found" });
-    res.json({ status: true, message: "student deleted successfully" });
+        .status(200)
+        .json({ status: false, error: "student not found",data:[] });
+    res.json({ status: true, message: "student deleted successfully" ,data:[]});
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }

@@ -15,7 +15,7 @@ exports.createInstructor = async (req, res) => {
       const newInstructor = new Instructor(instructorData);
       await newInstructor.save();
       res
-        .status(201)
+        .status(200)
         .json({ status : true, message: "Instructor Created Successfully", data: newInstructor });
     } catch (error) {
       res.status(400).json({ status : false, error: error.message });
@@ -51,7 +51,7 @@ exports.createInstructor = async (req, res) => {
 exports.getInstructorById = async (req, res) => {
     try {
       const instructor = await Instructor.findById(req.params.id);
-      if (!instructor) return res.status(404).json({ error: "instructor not found" });
+      if (!instructor) return res.status(200).json({ error: "instructor not found",data:[] });
       res.status(200).json({ status : true, message: "Single instructor Listed Successfully", data: instructor });
     } catch (error) {
       res.status(500).json({ status : false, error: error.message });
@@ -69,7 +69,7 @@ exports.updateInstructor = async (req, res) => {
     }
     const instructor = await Instructor.findByIdAndUpdate(req.params.id,updatedData,{ new: true, runValidators: true });
     if (!instructor) {
-      return res.status(404).json({ status: false, error: 'Instructor not found' });
+      return res.status(200).json({ status: false, error: 'Instructor not found' ,data:[]});
     }
     res.status(200).json({
       status: true,
@@ -86,7 +86,7 @@ exports.updateInstructor = async (req, res) => {
 exports.deleteInstructor = async (req, res) => {
     try {
       const instructor = await Instructor.findByIdAndDelete(req.params.id);
-      if (!instructor) return res.status(404).json({ error: 'instructor not found' });
+      if (!instructor) return res.status(200).json({ error: 'instructor not found' ,data:[]});
       res.json({  status : true,message: 'instructor deleted successfully' });
     } catch (error) {
       res.status(500).json({ status : false, error: error.message });

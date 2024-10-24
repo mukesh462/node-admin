@@ -6,6 +6,6 @@ router.post('/create', myclassController.createMyclass);
 router.post('/list', myclassController.getAllMyclass);
 router.get('/:id', myclassController.getMyclassById);
 router.post('/update/:id', myclassController.updateMyclass);
-router.delete('/:id', myclassController.deleteMyclass);
+router.delete('/delete/:id', myclassController.deleteMyclass);
 
 module.exports = router;

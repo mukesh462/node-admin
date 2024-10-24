@@ -53,7 +53,7 @@ exports.getSubcategoryById = async (req, res) => {
   try {
     const SubCategory = await Subcategory.findById(req.params.id);
     if (!SubCategory)
-      return res.status(200).json({status: false, error: "Subcategory not found" });
+      return res.status(200).json({status: false, error: "Subcategory not found" ,data:[]});
     res.status(200).json({
       status: true,
       message: "Single Subcategory Listed Successfully",
@@ -74,8 +74,8 @@ exports.updateSubcategory = async (req, res) => {
     );
     if (!SubCategory)
       return res
-        .status(404)
-        .json({ status: false, error: "Subcategory not found" });
+        .status(200)
+        .json({ status: false, error: "Subcategory not found",data:[] });
     res.status(200).json({
       status: true,
       message: "Subcategory Updated Successfully",
@@ -92,9 +92,9 @@ exports.deleteSubcategory = async (req, res) => {
     const SubCategory = await Subcategory.findByIdAndDelete(req.params.id);
     if (!SubCategory)
       return res
-        .status(404)
-        .json({ status: false, error: "Subcategory not found" });
-    res.json({ status: true, message: "Subcategory deleted successfully" });
+        .status(200)
+        .json({ status: false, error: "Subcategory not found",data:[] });
+    res.json({ status: true, message: "Subcategory deleted successfully" ,data:[]});
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }

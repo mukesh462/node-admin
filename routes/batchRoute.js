@@ -6,6 +6,6 @@ router.post('/list', batchController.getAllBatch);
 router.post('/create', batchController.createBatch);
 router.get('/:id', batchController.getBatchById);
 router.post('/update/:id', batchController.updateBatch);
-router.delete('/:id', batchController.deleteBatch);
+router.delete('/delete/:id', batchController.deleteBatch);
 
 module.exports = router;

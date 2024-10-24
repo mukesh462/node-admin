@@ -48,8 +48,8 @@ exports.getMyclassById = async (req, res) => {
     const myclass = await Myclass.findById(req.params.id);
     if (!myclass)
       return res
-        .status(404)
-        .json({ status: false, error: "myclass not found" });
+        .status(200)
+        .json({ status: false, error: "myclass not found" ,data:[]});
     res
       .status(200)
       .json({
@@ -71,8 +71,8 @@ exports.updateMyclass = async (req, res) => {
     });
     if (!myclass)
       return res
-        .status(404)
-        .json({ status: false, error: "myclass not found" });
+        .status(200)
+        .json({ status: false, error: "myclass not found" ,data:[]});
     res
       .status(200)
       .json({
@@ -91,9 +91,9 @@ exports.deleteMyclass = async (req, res) => {
     const myclass = await Myclass.findByIdAndDelete(req.params.id);
     if (!myclass)
       return res
-        .status(404)
-        .json({ status: false, error: "myclass not found" });
-    res.json({ status: true, message: "myclass deleted successfully" });
+        .status(200)
+        .json({ status: false, error: "myclass not found" ,data:[]});
+    res.json({ status: true, message: "myclass deleted successfully",data:[] });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
