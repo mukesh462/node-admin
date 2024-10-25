@@ -12,6 +12,9 @@ const courseRoutes = require("./routes/courseRoute");
 const studentRoutes = require("./routes/studentRoute");
 const myclassRoutes = require("./routes/myclassRoute");
 const authRoutes = require("./routes/authRoute");
+const MaterialLinkRoutes = require("./routes/materiallinkRoute");
+
+
 
 const Item = require("./Models/Items"); // Ensure the path is correct
 
@@ -44,6 +47,7 @@ app.use("/api/instructor", instructorRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/myclass", myclassRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/materiallink", MaterialLinkRoutes);
 
 
 // Route for single file upload
