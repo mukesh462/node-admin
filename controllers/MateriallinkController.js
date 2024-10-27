@@ -3,7 +3,15 @@ const Materiallink = require("../Models/Materiallink");
 // Create a new materiallink
 exports.createMateriallink = async (req, res) => {
   try {
-    const newMateriallink = new Materiallink(req.body);
+
+    if (!req.file) {
+      return res.status(400).json({ status: false, message: 'File upload is required' });
+    }
+    const materiallinkData = {
+      ...req.body,
+      filelink: `uploads/${req.file.filename}`
+    };
+    const newMateriallink = new Materiallink(materiallinkData);
     await newMateriallink.save();
     res
       .status(200)

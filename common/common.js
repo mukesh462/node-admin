@@ -23,14 +23,14 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 1024 * 1024 * 5 },
   fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png|gif/;
+    const filetypes = /jpeg|jpg|png|gif|pdf|doc|docx|xlsx|csv|ppt|pptx|txt|rtf|svg|mp3|wav|mp4|mov|zip|rar/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
     
     if (extname && mimetype) {
       return cb(null, true);
     } else {
-      cb('Error: Only images are allowed!');
+      cb('Error: Only jpeg|jpg|png|gif|pdf|doc|docx|xlsx|csv|ppt|pptx|txt|rtf|svg|mp3|wav|mp4|mov|zip|rar are allowed!');
     }
   }
 });
