@@ -1,8 +1,15 @@
 const Batch = require("../Models/Batch");
+const mongoose = require('mongoose');
+const Course = require('../Models/Course');
 
 // Create a new batch
 exports.createBatch = async (req, res) => {
   try {
+
+    if (req.body.course_id) {
+      req.body.course_id = new mongoose.Types.ObjectId(req.body.course_id);
+    }
+    
     const newBatch = new Batch(req.body);
     await newBatch.save();
     res
@@ -19,16 +26,29 @@ exports.getAllBatch = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
-    const batch = await Batch.find().populate('course_id').skip(startIndex).limit(limit);
-    console.log('Batches:', batch);
 
+    const courses = await Course.find({}, 'course_name');
+    
+    const courseMap = courses.reduce((map, course) => {
+      map[course._id.toString()] = course.course_name;
+      return map;
+    }, {});
+
+    const batches = await Batch.find().skip(startIndex).limit(limit);
+   
+    const batchData = batches.map(batch => ({
+      _id: batch._id,
+      batch_name: batch.batch_name,
+      course_name: courseMap[batch.course_id?.toString()] || null,
+      status: batch.status
+    }));
     const totalBatch = await Batch.countDocuments();
     const totalPages = Math.ceil(totalBatch / limit);
     const nextPage = page < totalPages ? page + 1 : null;
     res.status(200).json({
       status: true,
       message: "Batch Listed Successfully",
-      data: batch,
+      data: batchData,
       paginate: {
         total_count: totalBatch,
         current_page: page,
