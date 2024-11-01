@@ -47,7 +47,7 @@ app.use("/api/instructor", instructorRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/myclass", myclassRoutes);
 app.use('/api/auth', authRoutes);
-app.use("/api/materiallink", MaterialLinkRoutes);
+app.use("/api/materialLink", MaterialLinkRoutes);
 
 
 // Route for single file upload
