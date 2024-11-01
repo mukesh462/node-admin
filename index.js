@@ -74,7 +74,9 @@ app.post('/api/upload-multiple', upload.array('files', 10), (req, res) => {
     res.status(400).send('No files uploaded or invalid file type.');
   }
 });
-
+app.get('/',(req,res)=>{
+  return res.json({message:"all good"})
+})
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
