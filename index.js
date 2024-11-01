@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(bodyParser.json());
-
+// app.use(express.json())
 app.use('/uploads', express.static('uploads'));
 // MongoDB connection
 mongoose
@@ -80,3 +80,4 @@ app.get('/',(req,res)=>{
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+module.exports = app;
