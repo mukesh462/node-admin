@@ -92,3 +92,16 @@ exports.deleteInstructor = async (req, res) => {
       res.status(500).json({ status : false, error: error.message });
     }}
   
+
+exports.getAllInst = async (req, res) => {
+  try {
+    const instructors = await Instructor.find();
+    res.status(200).json({
+      status: true,
+      message: "Instructors Listed Successfully",
+      data: instructors,
+    });
+  } catch (error) {
+    res.status(500).json({ status : false, error: error.message });
+  }
+};
