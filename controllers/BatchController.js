@@ -29,6 +29,8 @@ exports.getAllBatch = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
+    const batch = await Batch.find().populate({path:'course_id',select:"course_name"}).skip(startIndex).limit(limit);
+    console.log('Batches:', batch);
 
     const courses = await Course.find({}, "course_name");
 

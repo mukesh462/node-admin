@@ -1,4 +1,6 @@
+const Materiallink = require("../Models/Materiallink");
 const Myclass = require("../Models/Myclass");
+const Student = require("../Models/Student");
 
 // Create a new myclass
 exports.createMyclass = async (req, res) => {
@@ -98,3 +100,65 @@ exports.deleteMyclass = async (req, res) => {
     res.status(500).json({ status: false, error: error.message });
   }
 };
+
+//My classes
+exports.Myclasses = async(req,res) =>{
+  try{
+    const {user_id} = req.body;
+
+    if (!user_id) {
+      return res.status(200).json({ message: 'user_id are required' });
+    }
+    const check_student = await Student.findOne({_id:user_id});
+
+    if(!check_student){
+      return res.status(200).json({ message: 'user_id Invalid' });
+    }
+    //get calsses for particular student
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const studentClasses = await Myclass.find({
+      $or: [
+          {
+              class_type: "1",
+              batch_or_student_id: check_student.batch_id,
+              date: { $gte: startOfDay, $lt: endOfDay } 
+          },
+          {
+              class_type: "2",
+              batch_or_student_id: user_id,
+              date: { $gte: startOfDay, $lt: endOfDay } 
+          }
+      ]
+    });
+
+    if(!studentClasses){
+      return res.status(200).json({ status: false, message: 'data listed successfully', data:[] });
+    }
+
+    const material_ids = studentClasses.flatMap(studentclass =>studentclass.materials);
+    const materials = await Materiallink.find({
+      _id:{$in:material_ids}
+    })
+
+    const materialsMap = materials.reduce((map, material) => {
+      map[material._id.toString()] = material;
+      return map;
+    }, {});
+
+    const finalResult = studentClasses.map(studentClass => {
+      return{
+        ...studentClass._doc,
+        materials: studentClass.materials.map(id => materialsMap[id])
+      }
+    });
+
+    return res.status(200).json({ status: true, message: 'data listed successfully', data:finalResult });
+
+  }catch (error){
+    res.status(500).json({ status: false, error: error.message });
+  }
+}
