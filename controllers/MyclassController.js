@@ -167,6 +167,9 @@ exports.Myclasses = async(req,res) =>{
 exports.MyRecords = async(req,res) =>{
   try{
     const {user_id} = req.body;
+    const page = parseInt(req.body.page) || 1;
+    const limit = parseInt(req.body.limit) || 10;
+    const startIndex = (page - 1) * limit;
 
     if (!user_id) {
       return res.status(200).json({ message: 'user_id are required' });
@@ -176,7 +179,7 @@ exports.MyRecords = async(req,res) =>{
     if(!check_student){
       return res.status(200).json({ message: 'user_id Invalid' });
     }
-    const studentClasses = await Myclass.find({
+    const query = {
       $or: [
           {
               class_type: "1",
@@ -187,8 +190,13 @@ exports.MyRecords = async(req,res) =>{
               batch_or_student_id: user_id,
           }
       ],
-      recordingUrl:{$ne:null}
-    });
+      recordingUrl: { $ne: null }
+    };
+  
+  const studentClasses = await Myclass.find(query).skip(startIndex).limit(limit);
+  const totalMyclass = await Myclass.countDocuments(query);  
+  const totalPages = Math.ceil(totalMyclass / limit);
+  const nextPage = page < totalPages ? page + 1 : null;
 
     if(!studentClasses){
       return res.status(200).json({ status: false, message: 'data listed successfully', data:[] });
@@ -211,7 +219,12 @@ exports.MyRecords = async(req,res) =>{
       }
     });
 
-    return res.status(200).json({ status: true, message: 'data listed successfully', data:finalResult });
+    return res.status(200).json({ status: true, message: 'data listed successfully', data:finalResult,
+      paginate: {
+      total_count: totalMyclass,
+      current_page: page,
+      next_page: nextPage ?? null,
+    }, });
 
   }catch (error){
     res.status(500).json({ status: false, error: error.message });
