@@ -10,7 +10,7 @@ const MyclassSchema = new mongoose.Schema({
   instructor_id: { type: String, required: true },
   materials: { type: Array, required: true }, 
   zoomLink: { type: String, required: false },
-  recordingUrl: { type: String, required: false },
+  recordingUrl: { type: String, required: false,default:null },
   class_type: { type: Number, required: true },
   batch_or_student_id: { type: String, required: false },
 });
