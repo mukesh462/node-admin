@@ -72,15 +72,12 @@ exports.listData = async (req, res) => {
 
 exports.searchMaterialByName = async (req, res) => {
   try {
-    const searchTerm = req.body.search; // Get the search term from query parameters
+    const searchTerm = req.body.search;
+    const query = searchTerm
+      ? { name: { $regex: searchTerm, $options: 'i' } } 
+      : {}; 
 
-    if (!searchTerm) {
-      return res.status(400).json({ status: false, message: "Search term is required" });
-    }
-
-    const materials = await Materiallink.find({
-      name: { $regex: searchTerm, $options: 'i' } // Case-insensitive search
-    });
+    const materials = await Materiallink.find(query);
 
     res.status(200).json({
       status: true,

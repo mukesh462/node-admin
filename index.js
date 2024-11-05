@@ -21,7 +21,8 @@ const Item = require("./Models/Items"); // Ensure the path is correct
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+var cors = require('cors')
+app.use(cors())
 // Middleware
 app.use(bodyParser.json());
 // app.use(express.json())

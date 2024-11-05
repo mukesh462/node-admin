@@ -2,3 +2,4 @@
 /uploads
 .vercel
 .env
+package-lock.json
