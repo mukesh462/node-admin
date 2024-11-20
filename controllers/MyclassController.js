@@ -198,11 +198,16 @@ exports.MyRecords = async (req, res) => {
     }
 
     const query = {
-      $or: [
-        { class_type: "1", batch_or_student_id: check_student.batch_id },
-        { class_type: "2", batch_or_student_id: user_id },
+      $and: [
+        {
+          $or: [
+            { class_type: "1", batch_or_student_id: check_student.batch_id },
+            { class_type: "2", batch_or_student_id: user_id },
+          ],
+        },
+        { recordingUrl: { $ne: null } }, // recordingUrl is not null
+        { recordingUrl: { $ne: "" } },  // recordingUrl is not an empty string
       ],
-      recordingUrl: { $ne: null },
     };
 
     const studentClasses = await Myclass.find(query)

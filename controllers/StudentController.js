@@ -9,7 +9,7 @@ exports.createStudent = async (req, res) => {
     const newStudent = new Student({
       ...studentData,
       pwd: hashedPassword,
-      profile: `uploads/${req.file.filename}`,
+      profile: req.file ? `uploads/${req.file.filename}` : null,
     });
     await newStudent.save();
     res.status(200).json({

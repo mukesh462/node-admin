@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const MyclassSchema = new mongoose.Schema({
   topic_name: { type: String, required: true },
   description: { type: String, required: true },
-  short_description: { type: String, required: true },
+  short_description: { type: String, required: false },
   date: { type: Date, required: true },
   start_time: { type: Date, required: true }, 
   end_time: { type: Date, required: true },   
