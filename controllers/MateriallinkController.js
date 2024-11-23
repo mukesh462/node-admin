@@ -1,5 +1,6 @@
 const Materiallink = require("../Models/Materiallink");
-
+const fs = require('fs');
+const path = require('path');
 // Create a new materiallink
 exports.createMateriallink = async (req, res) => {
   try {
@@ -26,20 +27,61 @@ exports.createMateriallink = async (req, res) => {
 };
 
 // Delete an materiallink by ID
+// exports.deleteMateriallink = async (req, res) => {
+//   try {
+//     const materiallink = await Materiallink.findByIdAndDelete(req.params.id);
+//     if (!materiallink)
+//       return res
+//         .status(200)
+//         .json({ status: false, error: "Materiallink not found" });
+//     res.json({
+//       status: true,
+//       message: "Materiallink deleted successfully",
+//       data: [],
+//     });
+//   } catch (error) {
+//     res.status(500).json({ status: false, error: error.message });
+//   }
+// };
 exports.deleteMateriallink = async (req, res) => {
   try {
-    const materiallink = await Materiallink.findByIdAndDelete(req.params.id);
-    if (!materiallink)
+    // Find the material link by ID
+    const materiallink = await Materiallink.findById(req.params.id);
+    if (!materiallink) {
       return res
-        .status(200)
-        .json({ status: false, error: "Materiallink not found" });
+        .status(404)
+        .json({ status: false, message: "Materiallink not found" });
+    }
+
+    
+    const filePath = path.resolve(__dirname, '..', materiallink.filelink); 
+
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+          return res.status(500).json({
+            status: false,
+            massage: "Failed to delete the associated file",
+          });
+        }
+        console.log("File deleted successfully:", filePath);
+      });
+    } else {
+      console.log("File not found:", filePath);
+    }
+
+    // Delete the Materiallink record from the database
+    await Materiallink.findByIdAndDelete(req.params.id);
+
+    // Send success response
     res.json({
       status: true,
-      message: "Materiallink deleted successfully",
+      message: "Materiallink  deleted successfully",
       data: [],
     });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 

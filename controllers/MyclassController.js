@@ -108,26 +108,42 @@ exports.deleteMyclass = async (req, res) => {
     res.status(500).json({ status: false, error: error.message });
   }
 };
-
-//My classes
 exports.Myclasses = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const { user_id, page = 1, limit = 10 } = req.body;
 
     if (!user_id) {
-      return res.status(200).json({ message: "user_id are required" });
+      return res.status(200).json({ message: "user_id is required" });
     }
+
     const check_student = await Student.findOne({ _id: user_id });
 
     if (!check_student) {
-      return res.status(200).json({ message: "user_id Invalid" });
+      return res.status(200).json({ message: "Invalid user_id" });
     }
-    //get calsses for particular student
+
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    // Fetch total count for pagination
+    const totalCount = await Myclass.countDocuments({
+      $or: [
+        {
+          class_type: "1",
+          batch_or_student_id: check_student.batch_id,
+          date: { $gte: startOfDay, $lt: endOfDay },
+        },
+        {
+          class_type: "2",
+          batch_or_student_id: user_id,
+          date: { $gte: startOfDay, $lt: endOfDay },
+        },
+      ],
+    });
+
+    // Fetch paginated data
     const studentClasses = await Myclass.find({
       $or: [
         {
@@ -141,12 +157,15 @@ exports.Myclasses = async (req, res) => {
           date: { $gte: startOfDay, $lt: endOfDay },
         },
       ],
-    }).populate({path:"instructor_id"});
+    })
+      .populate({ path: "instructor_id" })
+      .skip((page - 1) * limit) // Skip documents based on page
+      .limit(Number(limit)); // Limit the number of documents returned
 
-    if (!studentClasses) {
+    if (!studentClasses || studentClasses.length === 0) {
       return res
         .status(200)
-        .json({ status: false, message: "data listed successfully", data: [] });
+        .json({ status: false, message: "No classes found", data: [] });
     }
 
     const material_ids = studentClasses.flatMap(
@@ -168,13 +187,14 @@ exports.Myclasses = async (req, res) => {
       };
     });
 
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "data listed successfully",
-        data: finalResult,
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Data listed successfully",
+      data: finalResult,
+      totalCount, // Include total count for pagination
+      totalPages: Math.ceil(totalCount / limit), // Calculate total pages
+      currentPage: page, // Include current page
+    });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }

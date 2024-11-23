@@ -18,7 +18,7 @@ exports.createStudent = async (req, res) => {
       data: newStudent,
     });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -110,7 +110,7 @@ exports.updateStudent = async (req, res) => {
       data: student,
     });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -128,7 +128,7 @@ exports.deleteStudent = async (req, res) => {
       data: [],
     });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
 exports.studentAll = async (req, res) => {
@@ -144,6 +144,6 @@ exports.studentAll = async (req, res) => {
       data: student,
     });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
