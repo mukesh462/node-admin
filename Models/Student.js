@@ -11,7 +11,7 @@ const StudentSchema = new mongoose.Schema({
   pwd: { type: String, required: true },
   pnumber: { type: String, required: true },
   profile: { type: String, required: false , default:null },
-  batch_id: { type: String, required: true,ref:"Batch" },
+  batch_id: { type: mongoose.Types.ObjectId, required: true, ref:"Batch" },
   isAdmin: { type: String, required: true, default: 0 },
   dateofjoining: { type: String, required: true },
   status: { type: String, required: true, default: 1 },

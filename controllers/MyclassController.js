@@ -165,7 +165,7 @@ exports.Myclasses = async (req, res) => {
     if (!studentClasses || studentClasses.length === 0) {
       return res
         .status(200)
-        .json({ status: false, message: "No classes found", data: [] });
+        .json({ status: true, message: "No classes found", data: [] });
     }
 
     const material_ids = studentClasses.flatMap(

@@ -38,7 +38,8 @@ exports.loginStudent = async (req, res) => {
 
     // Prepare response data
     const {  ...studentData } = student._doc;
-    const batchName = student.batch_id?.name || null;
+    const batchName = student?.batch_id;
+    // console.log(batchName,'ddd')
 
     res.status(200).json({
       status: true,
