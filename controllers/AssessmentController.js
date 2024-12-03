@@ -1,9 +1,13 @@
 const Assessment = require("../Models/Assessment");
 const Student = require("../Models/Student");
 const TaskSubmit = require("../Models/TaskSubmit");
+
+const mongoose = require("mongoose");
+
 exports.createTask = async (req, res) => {
   try {
     const {
+      title,
       assessment_type,
       particular_id,
       start_date,
@@ -35,6 +39,7 @@ exports.createTask = async (req, res) => {
       start_time,
       end_time,
       questions,
+      title,
     });
 
     await newTask.save();
@@ -54,7 +59,10 @@ exports.getAllTask = async (req, res) => {
     const page = parseInt(req.body.page) || 1;
     const limit = parseInt(req.body.limit) || 10;
     const startIndex = (page - 1) * limit;
-    const category = await Assessment.find().skip(startIndex).limit(limit);
+    const category = await Assessment.find()
+      .sort({ start_date: -1 })
+      .skip(startIndex)
+      .limit(limit);
     const totalCategory = await Assessment.countDocuments();
     const totalPages = Math.ceil(totalCategory / limit);
     const nextPage = page < totalPages ? page + 1 : null;
@@ -88,7 +96,7 @@ exports.myTaskList = async (req, res) => {
     const student = await Student.findById(user_id);
     if (!student) {
       return res
-        .status(404)
+        .status(200)
         .json({ status: false, message: "Student not found" });
     }
 
@@ -100,22 +108,25 @@ exports.myTaskList = async (req, res) => {
         },
         {
           assessment_type: "batch",
-          "particular_id.value": student.batch_id,
+          "particular_id.value": {
+            $in: [
+              new mongoose.Types.ObjectId(student.batch_id), 
+              student.batch_id.toString(),
+            ],
+          },
         },
       ],
       start_date: { $lte: currentDate },
       end_date: { $gte: currentDate },
-      start_time: { $lte: currentDate },
-      end_time: { $gte: currentDate },
     };
+    
+    const tasks = await Assessment.find(query).sort({ start_date: -1 });
 
-    const tasks = await Assessment.find(query).sort({ start_date: 1 });
-
-    if (!tasks.length) {
-      return res
-        .status(200)
-        .json({ status: true, message: "No tasks found", data: [] });
-    }
+    // if (!tasks.length) {
+    //   return res
+    //     .status(200)
+    //     .json({ status: true, message: "No tasks found", data: [] });
+    // }
 
     const submittedTasks = await TaskSubmit.find({ student_id: user_id });
     const submittedTaskIds = submittedTasks.map(
@@ -124,9 +135,18 @@ exports.myTaskList = async (req, res) => {
 
     const finalResult = tasks.map((task) => {
       const isSubmitted = submittedTaskIds.includes(task._id.toString());
+
+      // Time-specific validation
+      // const taskStartTime = new Date(task.start_time).getHours();
+      // const taskEndTime = new Date(task.end_time).getHours();
+      // const currentHour = currentDate.getHours();
+      // const isTimeActive =
+      //   currentHour >= taskStartTime && currentHour <= taskEndTime;
+
       return {
         ...task._doc,
         submission_status: isSubmitted ? 1 : 0,
+        // time_active: isTimeActive ? 1 : 0,
       };
     });
 
@@ -139,6 +159,7 @@ exports.myTaskList = async (req, res) => {
     res.status(500).json({ status: false, error: error.message });
   }
 };
+
 exports.deleteTask = async (req, res) => {
   try {
     const category = await Assessment.findByIdAndDelete(req.params.id);
@@ -197,11 +218,18 @@ exports.taskHistory = async (req, res) => {
         },
         {
           assessment_type: "batch",
-          "particular_id.value": student.batch_id,
+          "particular_id.value": {
+            $in: [
+              new mongoose.Types.ObjectId(student.batch_id), 
+              student.batch_id.toString(),
+            ],
+          },
         },
       ],
-      end_date: { $lt: currentDate },
+      start_date: { $lte: currentDate },
+      end_date: { $gte: currentDate },
     };
+    
 
     const totalAssessments = await Assessment.countDocuments(query);
     const totalPages = Math.ceil(totalAssessments / limit);
@@ -237,5 +265,78 @@ exports.taskHistory = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
+  }
+};
+exports.createTaskSubmission = async (req, res) => {
+  try {
+    const { questions, student_id, assessment_id, status } = req.body;
+
+    if (!questions || !student_id || !assessment_id) {
+      return res.status(400).json({
+        status: false,
+        message: "Questions, Student ID, and Assessment ID are required",
+      });
+    }
+
+    const existingSubmission = await TaskSubmit.findOne({
+      student_id,
+      assessment_id,
+    });
+
+    if (existingSubmission) {
+      return res.status(400).json({
+        status: false,
+        message: "Task has already been submitted by this student for this assessment",
+      });
+    }
+
+    const newTaskSubmission = new TaskSubmit({
+      task: questions,
+      student_id,
+      assessment_id,
+      status: status || "0",
+    });
+
+    const savedTaskSubmission = await newTaskSubmission.save();
+
+    res.status(201).json({
+      status: true,
+      message: "Task submission created successfully",
+      data: savedTaskSubmission,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+exports.viewSubmittedAnswer = async (req, res) => {
+  try {
+    const { student_id, assessment_id } = req.body;
+
+    if (!student_id || !assessment_id) {
+      return res.status(400).json({
+        status: false,
+        message: "Student ID and Assessment ID are required",
+      });
+    }
+
+    const submission = await TaskSubmit.findOne({
+      student_id,
+      assessment_id,
+    });
+
+    if (!submission) {
+      return res.status(404).json({
+        status: false,
+        message: "No submission found for the given student and assessment",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Submission retrieved successfully",
+      data: submission,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
   }
 };

@@ -8,6 +8,7 @@ const AssessmentSchema = new mongoose.Schema({
   end_time: { type: Date, required: true },
   start_date: { type: Date, required: true },
   end_date: { type: Date, required: true },
+  title:{type :String,required:true}
 });
 
 const Assessment = mongoose.model("Assessment", AssessmentSchema);
