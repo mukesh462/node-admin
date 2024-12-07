@@ -10,7 +10,7 @@ router.delete("/deleteTask/:id", batchController.deleteTask);
 router.get('/:id', batchController.getTaskById);
 router.post('/submitTask', batchController.createTaskSubmission);
 router.post('/getAnswer', batchController.viewSubmittedAnswer);
-// router.get('getAnswer/:id', batchController.viewSubmittedAnswer);
-
+router.post('/TaskSubmitStudent', batchController.getTaskSubmissions);
+router.post('/reviewAnswer', batchController.updateTaskSubmission);
 
 module.exports = router;

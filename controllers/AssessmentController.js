@@ -110,7 +110,7 @@ exports.myTaskList = async (req, res) => {
           assessment_type: "batch",
           "particular_id.value": {
             $in: [
-              new mongoose.Types.ObjectId(student.batch_id), 
+              new mongoose.Types.ObjectId(student.batch_id),
               student.batch_id.toString(),
             ],
           },
@@ -119,7 +119,7 @@ exports.myTaskList = async (req, res) => {
       start_date: { $lte: currentDate },
       end_date: { $gte: currentDate },
     };
-    
+
     const tasks = await Assessment.find(query).sort({ start_date: -1 });
 
     // if (!tasks.length) {
@@ -220,7 +220,7 @@ exports.taskHistory = async (req, res) => {
           assessment_type: "batch",
           "particular_id.value": {
             $in: [
-              new mongoose.Types.ObjectId(student.batch_id), 
+              new mongoose.Types.ObjectId(student.batch_id),
               student.batch_id.toString(),
             ],
           },
@@ -229,7 +229,6 @@ exports.taskHistory = async (req, res) => {
       start_date: { $lte: currentDate },
       end_date: { $gte: currentDate },
     };
-    
 
     const totalAssessments = await Assessment.countDocuments(query);
     const totalPages = Math.ceil(totalAssessments / limit);
@@ -246,10 +245,12 @@ exports.taskHistory = async (req, res) => {
     );
 
     const finalResult = expiredTasks.map((task) => {
-      const isSubmitted = submittedTaskIds.includes(task._id.toString());
+      // const isSubmitted = submittedTaskIds.includes(task._id.toString());
+      const status =submittedTasks.find((data)=> data.assessment_id == task._id ) ;
       return {
         ...task._doc,
-        submission_status: isSubmitted ? 1 : 0,
+        submission_status: status != undefined ? status?.status : 0,
+        mark:  status != undefined ? status.questions.filter(e=> e.review =='yes').length : null
       };
     });
 
@@ -286,15 +287,16 @@ exports.createTaskSubmission = async (req, res) => {
     if (existingSubmission) {
       return res.status(400).json({
         status: false,
-        message: "Task has already been submitted by this student for this assessment",
+        message:
+          "Task has already been submitted by this student for this assessment",
       });
     }
 
     const newTaskSubmission = new TaskSubmit({
-      task: questions,
+      questions: questions,
       student_id,
       assessment_id,
-      status: status || "0",
+      status: "0",
     });
 
     const savedTaskSubmission = await newTaskSubmission.save();
@@ -335,6 +337,90 @@ exports.viewSubmittedAnswer = async (req, res) => {
       status: true,
       message: "Submission retrieved successfully",
       data: submission,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+exports.getTaskSubmissions = async (req, res) => {
+  try {
+    const { assessment_id, page = 1, limit = 10 } = req.body;
+
+    if (!assessment_id) {
+      return res.status(400).json({
+        status: false,
+        message: "Assessment ID is required",
+      });
+    }
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const submissions = await TaskSubmit.find({ assessment_id })
+      .populate("student_id", "name email")
+      .skip(skip)
+      .limit(limitNum);
+
+    const totalSubmissions = await TaskSubmit.countDocuments({ assessment_id });
+    const totalPages = Math.ceil(totalSubmissions / limitNum);
+    const nextPage = pageNum < totalPages ? pageNum + 1 : null;
+
+    res.status(200).json({
+      status: true,
+      message: "Task submissions listed successfully",
+      data: submissions.map((submission) => ({
+        submission_id: submission._id,
+        student_name: submission.student_id?.name || "Unknown",
+        student_email: submission.student_id?.email || "Unknown",
+        task: submission.task,
+        status: submission.status,
+        profile: submission.student_id?.profile || null,
+        assessment_id: submission.assessment_id,
+        student_id: submission.student_id?._id,
+      })),
+      paginate: {
+        total_count: totalSubmissions,
+        current_page: pageNum,
+        next_page: nextPage,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+exports.updateTaskSubmission = async (req, res) => {
+  try {
+    const { main_id } = req.body;
+
+    if (!main_id) {
+      return res.status(400).json({
+        status: false,
+        message: "Submission ID is required",
+      });
+    }
+
+    const updatedFields = req.body;
+
+    const updatedSubmission = await TaskSubmit.findByIdAndUpdate(
+      main_id,
+      { $set: updatedFields },
+      { new: true } 
+    );
+
+    if (!updatedSubmission) {
+      return res.status(404).json({
+        status: false,
+        message: "Task submission not found",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Task submission updated successfully",
+      data: updatedSubmission,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: error.message });
